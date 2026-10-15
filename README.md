@@ -1,0 +1,135 @@
+# Accessible PDF Editor
+
+A web application for creating PDFs that conform to **WCAG 2.2 AA** and **PDF/UA-1**, and for checking existing PDFs against the same rules.
+
+Most PDF tools treat accessibility as a clean-up step after the document is finished. This editor works the other way round: the document's structure (headings, lists, tables, images with alternative text) is built as you write. Every export is re-checked, and a PDF is only released when it passes.
+
+> **Status:** test build 5. The app is usable for creating simple accessible documents and for auditing existing PDFs. Editing existing PDFs in place is not supported yet. See [Roadmap](#roadmap).
+
+## Features
+
+### Create accessible PDFs
+
+- Write with **headings (H1–H6), paragraphs, lists, images, tables and page breaks**.
+- **Text properties:** font, size, bold, italic, colour, alignment and line spacing.
+- **Images:** informative images need alternative text; decorative images are saved as artifacts, so screen readers skip them.
+- **Tables:** header rows and columns are tagged with the correct scope. An optional caption, shading and striping are available, and the header row can repeat on each page.
+- **Lists:** bullet, dash, numbers, letters or Roman numerals. The numbering style is stored in the PDF, so screen readers announce it.
+- **20 embedded font families** under the SIL Open Font License, including Atkinson Hyperlegible Next, which was designed for readers with low vision.
+- **Live checks** for skipped heading levels, missing alternative text, tables without headers, text contrast, characters a font can't display, and more. Errors block export.
+- **Release gate:** every exported file is parsed again and audited before it can be downloaded.
+- **Drafts** autosave in the browser and can be saved as `.pwj` files.
+
+### Check existing PDFs
+
+- Shows the tag tree, reading order and untagged content, drawn over the rendered page.
+- Runs 19 automated rules mapped to WCAG success criteria and Matterhorn Protocol checkpoints.
+- Lists the checks that need a person, and exports an HTML accessibility report.
+
+### What every exported PDF contains
+
+| Item | Purpose |
+| --- | --- |
+| Tagged structure tree in reading order | Screen readers can navigate headings, lists and tables |
+| `/Alt` text on every informative figure | Images are described (WCAG 1.1.1) |
+| `TH` cells with `/Scope` | Data cells are read with their headers (WCAG 1.3.1) |
+| `ListNumbering` on lists | List type is announced |
+| Embedded fonts with `ToUnicode` maps | Text can be read aloud and extracted |
+| Page numbers, rules and shading as artifacts | Decoration is skipped |
+| XMP `dc:title`, `/Lang`, `DisplayDocTitle` | Title and language are announced (WCAG 2.4.2, 3.1.1) |
+| `pdfuaid:part = 1` | PDF/UA-1 identifier |
+| Bookmarks generated from headings | Fast navigation in long documents |
+| `/Tabs /S` on every page | Tab order follows the structure |
+
+## Getting started
+
+The app is a single self-contained file, `index.html`. Open it in a current version of Chrome, Edge, Firefox or Safari. Nothing is uploaded: PDFs are read and written entirely in the browser.
+
+Two resources load from public CDNs at runtime:
+
+- **PDF.js 3.11.174** from `cdnjs.cloudflare.com`, which renders and parses PDFs.
+- **IBM Plex** from Google Fonts, used only for the app's own interface. It is never embedded in exported PDFs.
+
+To work offline, download both and change the `<script>` and `<link>` URLs in `index.html` to point at local copies.
+
+For how to use the app, see the [user guide](docs/USER-GUIDE.md).
+
+## Draft files (`.pwj`)
+
+Drafts are UTF-8 JSON files with the `.pwj` extension. The format is documented in [docs/PWJ-FORMAT.md](docs/PWJ-FORMAT.md).
+
+> **Hosting note:** some hosting platforms only allow downloads of a fixed list of file types. If a `.pwj` download is refused, the app offers to save the draft as `.json` instead. The editor opens both.
+
+## How it works
+
+```
+Browser
+├── UI (vanilla JS)        Write view, Pages view, audit view, dialogs
+├── Authoring model        Blocks + document settings, autosaved to localStorage
+├── PDF writer             Lays out blocks, writes a tagged PDF/UA-1 file
+│                          (structure tree, MCIDs, ParentTree, Type0 fonts, XMP)
+└── Audit engine (PDF.js)  Reads the tag tree, marked content and metadata,
+                           runs the rules, draws overlays
+```
+
+1. **Authoring.** The document is a list of blocks. Reading order is always the block order.
+2. **Layout and writing.** On export, the writer:
+   - flows the blocks onto A4 or US Letter pages
+   - wraps text using each font's real glyph widths
+   - writes every piece of content inside marked content linked to a structure element
+   - marks everything decorative as an artifact
+3. **Fonts.** Each font is a subset covering Latin‑1, Latin Extended‑A and common punctuation. It is embedded as a `CIDFontType2` with `Identity-H` encoding and a `ToUnicode` map.
+4. **Verification.** The generated bytes go back through the audit engine. If any error is found, the export is stopped and reported as an editor bug rather than a problem with the user's document.
+
+### Validation
+
+The in-app checks cover the machine-checkable rules listed in the user guide. They are **not** a replacement for [veraPDF](https://verapdf.org) or [PAC](https://pac.pdf-accessibility.org/). Run exported files through one of those before relying on a conformance claim.
+
+The planned architecture adds a veraPDF validation service to the export step.
+
+## Fonts and licensing
+
+Every font bundled for embedding is licensed under the **SIL Open Font License 1.1** and declares **no Reserved Font Name**. This matters because the editor distributes subsetted copies, which the licence treats as modified versions; a modified version may not use a reserved name. For that reason, families such as IBM Plex, Lexend, Lato, Merriweather, Lora and Source Sans are deliberately not bundled.
+
+The 20 bundled families:
+
+| Sans serif | Serif | Monospaced |
+| --- | --- | --- |
+| Atkinson Hyperlegible Next, Inter, Open Sans, Noto Sans, Roboto, Public Sans, Work Sans, Figtree, Red Hat Text, Libre Franklin, Nunito Sans | Literata, Source Serif 4, Noto Serif, EB Garamond, Newsreader, Alegreya | JetBrains Mono, Roboto Mono, Red Hat Mono |
+
+Copyright notices and the full licence text are shown in the app under **Font licences**. They are also kept in each font file's name table.
+
+## Limitations
+
+- **Existing PDFs** can be checked but not edited.
+- **Formatting** such as bold, italic and font applies to a whole block, not to individual words.
+- **No links,** footnotes, form fields or multi-level lists yet.
+- **Fonts** cover Latin scripts only. Characters a font can't display are flagged before export.
+- **Images** are converted to JPEG, so transparent areas become white.
+- **Password-protected PDFs** can't be opened.
+- **Some checks** can't be done when auditing existing PDFs: table header scope, font embedding, tab order and contrast.
+- **No undo** yet.
+
+## Roadmap
+
+| Phase | Scope |
+| --- | --- |
+| 1 | Audit existing PDFs (done) |
+| 2 | Create accessible PDFs (current), then fix existing tagged PDFs in place, with veraPDF validation on export |
+| 3 | Auto-tagging for untagged PDFs: content-stream rewriting and layout detection |
+| 4 | OCR for scanned pages, form fields, text edits and PDF/UA-2 output |
+
+The planned production engine is **MuPDF.js** (AGPL), behind an engine interface, in place of PDF.js.
+
+## Contributing
+
+Issues and pull requests are welcome. When reporting a problem with an exported PDF:
+
+- attach the `.pwj` draft (remove anything confidential first)
+- include the veraPDF or PAC report if you have one
+
+Accessibility of the editor itself matters as much as accessibility of its output. It should work with a keyboard alone, with screen readers (NVDA, JAWS, VoiceOver) and at 400% zoom. Please report anywhere it falls short.
+
+## Licence
+
+The editor is released under the **GNU Affero General Public License v3.0** (AGPL‑3.0). Bundled fonts remain under the SIL Open Font License 1.1, and PDF.js is under the Apache License 2.0.
