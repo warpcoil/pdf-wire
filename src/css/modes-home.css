@@ -1,0 +1,21 @@
+/* modes */
+body:not([data-mode="audit"]) .only-audit{display:none!important}
+body:not([data-mode="author"]) .only-author{display:none!important}
+body:not([data-mode="home"]) .only-home{display:none!important}
+.chipnote{font-size:12px;padding:2px 9px;border-radius:999px;background:#2A2E36;color:#E6E8EB;white-space:nowrap}
+/* insert toolbar */
+.tlabel{font-weight:600;margin-right:4px}
+.ins{min-height:44px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-weight:500;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.ins:hover{background:var(--panel-2)}
+.split{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+.split .ins{border:0;border-radius:0}
+.split select{min-height:44px;border:0;border-left:1px solid var(--line);background:var(--panel);color:var(--ink);padding:0 8px}
+.tsep{width:1px;height:28px;background:var(--line);margin:0 4px}
+/* home */
+.home{max-width:920px;margin:7vh auto 0;padding:24px}
+.home h2{font-size:26px;line-height:1.25;margin:0 0 8px;font-weight:600;color:var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:24px 0 16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.card h3{margin:0;font-size:17px;font-weight:600}
+.card p{margin:0;color:var(--muted)}
+.card .actions{margin-top:auto;display:flex;flex-wrap:wrap;gap:10px}

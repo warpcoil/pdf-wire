@@ -1,26 +1,24 @@
 #!/usr/bin/env python3
 """PDF Wire build script.
 
-PDF Wire ships as one self-contained file, index.html. The only generated
-parts of that file are two JavaScript constants:
+PDF Wire ships as one self-contained file, index.html, compiled from src/:
 
-  const FONTDATA = {...};   subsetted fonts (base64) plus the metrics the
-                            PDF writer needs (cmap, widths, ascent, ...)
-  const FONTMETA = {...};   family list for the font picker and the
-                            "Font licences" dialog, plus the OFL text
-  const SAMPLE_PDF_B64 = "..."; the sample PDF opened from the home screen,
-                            copied from examples/riverside-sample-with-problems.pdf
-
-Everything else in index.html is hand-written source and is edited directly.
+  src/index.html        page template with include directives
+  src/css/*.css         styles, inlined into one <style> block
+  src/html/*.html       body markup
+  src/js/*.js           app code, concatenated inside one IIFE
+  src/generated/        font data written by the 'fonts' command (committed,
+                        so compiling needs no network or fontTools)
+  examples/riverside-sample-with-problems.pdf   embedded as the sample PDF
 
 Commands (run from the repository root):
 
-  python build/build.py fonts    download, instance and subset the fonts
-                                 into build/out/fontdata.json
-  python build/build.py embed    write FONTDATA, FONTMETA and SAMPLE_PDF_B64
-                                 into index.html
-  python build/build.py check    verify index.html (fonts, licences, cmaps)
-  python build/build.py all      fonts + embed + check
+  python build/build.py compile [--watch]   build index.html from src/
+  python build/build.py check               verify index.html: up to date
+                                            with src/, fonts, licences
+  python build/build.py fonts               download, instance and subset the
+                                            fonts into src/generated/
+  python build/build.py all                 fonts + compile + check
 
 See docs/BUILD.md for details.
 """
@@ -33,6 +31,7 @@ import io
 import json
 import re
 import sys
+import time
 import urllib.request
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -41,9 +40,11 @@ ROOT = Path(__file__).resolve().parent.parent
 BUILD = ROOT / "build"
 CONFIG = BUILD / "fonts.json"
 CACHE = BUILD / ".cache"
-OUT = BUILD / "out"
-FONTDATA_JSON = OUT / "fontdata.json"
-FONTMETA_JSON = OUT / "fontmeta.json"
+SRC = ROOT / "src"
+TEMPLATE = SRC / "index.html"
+GENERATED = SRC / "generated"
+FONTDATA_JSON = GENERATED / "fontdata.json"
+FONTMETA_JSON = GENERATED / "fontmeta.json"
 INDEX = ROOT / "index.html"
 OFL_TXT = ROOT / "OFL.txt"
 FONT_LICENSES = ROOT / "FONT-LICENSES.md"
@@ -129,6 +130,17 @@ def copyright_from_ofl(ofl_text: str) -> tuple[str, str]:
     first = ofl_text.strip().splitlines()[0].strip()
     m = re.search(r"\((https?://[^)]+)\)", first)
     return first, (m.group(1) if m else "")
+
+
+def write_text(path: Path, text: str) -> None:
+    """Write UTF-8 with LF line endings on every platform."""
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(text)
+
+
+def read_text(path: Path) -> str:
+    """Read UTF-8, normalising CRLF (e.g. from git autocrlf) to LF."""
+    return path.read_bytes().decode("utf-8-sig").replace("\r\n", "\n")
 
 
 def strip_ofl_header(text: str) -> str:
@@ -236,6 +248,9 @@ def build_one(job: dict) -> tuple[str, dict]:
     ps_name = fam.get("ps", fam["name"].replace(" ", "")) + "-" + ps_suffix
     set_names(font, fam["name"], style_name, ps_name, bold, italic)
 
+    # Keep head.modified from the source font so rebuilds are byte-identical
+    # and git only shows a change when a font really changed.
+    font.recalcTimestamp = False
     buf = io.BytesIO()
     font.save(buf)
     data = buf.getvalue()
@@ -317,14 +332,109 @@ def cmd_fonts(args) -> None:
 
     ofl = strip_ofl_header(OFL_TXT.read_text(encoding="utf-8")) if OFL_TXT.exists() else \
         strip_ofl_header(Path(dl["ofl"]).read_text(encoding="utf-8"))
-    OUT.mkdir(parents=True, exist_ok=True)
-    FONTDATA_JSON.write_text(json.dumps(ordered, ensure_ascii=False), encoding="utf-8")
-    FONTMETA_JSON.write_text(json.dumps({"families": meta_fams, "ofl": ofl}, ensure_ascii=False), encoding="utf-8")
+    GENERATED.mkdir(parents=True, exist_ok=True)
+    write_text(FONTDATA_JSON, json.dumps(ordered, ensure_ascii=False) + "\n")
+    write_text(FONTMETA_JSON, json.dumps({"families": meta_fams, "ofl": ofl}, ensure_ascii=False, indent=2) + "\n")
     log(f"wrote {FONTDATA_JSON.relative_to(ROOT)} and {FONTMETA_JSON.relative_to(ROOT)}")
 
 
 # --------------------------------------------------------------------------
-# embed / check
+# compile
+# --------------------------------------------------------------------------
+
+DIRECTIVE = re.compile(r"^[ \t]*<!--\s*@(include|generated)\s+(\S+)\s*-->[ \t]*$")
+
+
+def generated_data() -> str:
+    """The three data constants, one per line, as the app expects them."""
+    for p in (FONTDATA_JSON, FONTMETA_JSON):
+        if not p.exists():
+            raise SystemExit(f"{p.relative_to(ROOT)} missing; run 'python build/build.py fonts'")
+    fontdata = json.loads(read_text(FONTDATA_JSON))
+    fontmeta = json.loads(read_text(FONTMETA_JSON))
+    sample = base64.b64encode(SAMPLE_PDF.read_bytes()).decode("ascii")
+    return (
+        f"const SAMPLE_PDF_B64 = {json.dumps(sample)};\n"
+        f"const FONTDATA = {json.dumps(fontdata, ensure_ascii=False)};\n"
+        f"const FONTMETA = {json.dumps(fontmeta, ensure_ascii=False)};\n"
+    )
+
+
+def compile_html() -> tuple[str, list[Path]]:
+    """Expand src/index.html. Returns the page and the source files used.
+
+    Directives must stand alone on a line:
+      <!-- @include css/base.css -->   replaced by that file, verbatim
+      <!-- @generated data -->         replaced by SAMPLE_PDF_B64, FONTDATA, FONTMETA
+    """
+    used: list[Path] = [TEMPLATE]
+    out: list[str] = []
+    for n, line in enumerate(read_text(TEMPLATE).splitlines(keepends=True), 1):
+        m = DIRECTIVE.match(line.rstrip("\n"))
+        if not m:
+            out.append(line)
+            continue
+        kind, arg = m.groups()
+        if kind == "include":
+            path = (SRC / arg).resolve()
+            if SRC.resolve() not in path.parents or not path.is_file():
+                raise SystemExit(f"src/index.html:{n}: cannot include '{arg}'")
+            text = read_text(path)
+            out.append(text if text.endswith("\n") else text + "\n")
+            used.append(path)
+        elif arg == "data":
+            out.append(generated_data())
+            used += [FONTDATA_JSON, FONTMETA_JSON, SAMPLE_PDF]
+        else:
+            raise SystemExit(f"src/index.html:{n}: unknown @generated '{arg}'")
+    return "".join(out), used
+
+
+def unused_sources(used: list[Path]) -> list[Path]:
+    used_set = {p.resolve() for p in used}
+    return sorted(p for p in SRC.rglob("*")
+                  if p.is_file() and p.suffix in (".css", ".js", ".html")
+                  and p.resolve() not in used_set)
+
+
+def compile_once(out_path: Path) -> list[Path]:
+    html, used = compile_html()
+    write_text(out_path, html)
+    for p in unused_sources(used):
+        log(f"warning: {p.relative_to(ROOT)} is not included by src/index.html")
+    log(f"compiled {out_path.relative_to(ROOT) if out_path.is_relative_to(ROOT) else out_path} "
+        f"({out_path.stat().st_size:,} bytes, {len(used)} source files)")
+    return used
+
+
+def cmd_compile(args) -> None:
+    out_path = Path(args.out).resolve() if getattr(args, "out", None) else INDEX
+    compile_once(out_path)
+    if not getattr(args, "watch", False):
+        return
+    log("watching src/ for changes (Ctrl+C to stop)")
+
+    def snapshot() -> dict:
+        files = [p for p in SRC.rglob("*") if p.is_file()] + [SAMPLE_PDF]
+        return {p: p.stat().st_mtime_ns for p in files if p.exists()}
+
+    last = snapshot()
+    try:
+        while True:
+            time.sleep(0.5)
+            now = snapshot()
+            if now != last:
+                last = now
+                try:
+                    compile_once(out_path)
+                except SystemExit as ex:  # keep watching after a bad edit
+                    log(f"error: {ex}")
+    except KeyboardInterrupt:
+        pass
+
+
+# --------------------------------------------------------------------------
+# check
 # --------------------------------------------------------------------------
 
 def find_const(html: str, name: str) -> tuple[int, int]:
@@ -343,28 +453,11 @@ def find_const(html: str, name: str) -> tuple[int, int]:
     return start, end
 
 
-def cmd_embed(args) -> None:
-    for p in (FONTDATA_JSON, FONTMETA_JSON):
-        if not p.exists():
-            raise SystemExit(f"{p.relative_to(ROOT)} missing; run 'python build/build.py fonts' first")
-    # bytes, not read_text(): keep the file's line endings (LF or CRLF) as they are
-    html = INDEX.read_bytes().decode("utf-8")
-    for name, path in (("FONTDATA", FONTDATA_JSON), ("FONTMETA", FONTMETA_JSON)):
-        value = json.dumps(json.loads(path.read_text(encoding="utf-8")), ensure_ascii=False)
-        s, e = find_const(html, name)
-        html = html[:s] + value + html[e:]
-    if SAMPLE_PDF.exists():
-        s, e = find_const(html, "SAMPLE_PDF_B64")
-        html = html[:s] + json.dumps(base64.b64encode(SAMPLE_PDF.read_bytes()).decode("ascii")) + html[e:]
-    INDEX.write_bytes(html.encode("utf-8"))
-    log(f"updated {INDEX.name} ({INDEX.stat().st_size:,} bytes)")
-
-
 def cmd_check(args) -> None:
     from fontTools.ttLib import TTFont
 
     cfg = load_config()
-    html = INDEX.read_bytes().decode("utf-8")
+    html = read_text(INDEX)
     s, e = find_const(html, "FONTDATA")
     fontdata = json.loads(html[s:e])
     s, e = find_const(html, "FONTMETA")
@@ -372,6 +465,13 @@ def cmd_check(args) -> None:
     wanted = set(parse_unicodes(cfg["unicodes"]))
     errors, warnings = [], []
     gaps: dict[str, set[int]] = {}
+
+    if TEMPLATE.exists():
+        expected, used = compile_html()
+        if expected != html:
+            errors.append("index.html is out of date with src/; run 'python build/build.py compile'")
+        for p in unused_sources(used):
+            warnings.append(f"{p.relative_to(ROOT)} is not included by src/index.html")
 
     keys = [f["key"] for f in cfg["families"]]
     meta_keys = [f["key"] for f in fontmeta["families"]]
@@ -420,13 +520,13 @@ def cmd_check(args) -> None:
             elif fam["copyright"] not in md:
                 warnings.append(f"FONT-LICENSES.md copyright for {fam['name']} differs from FONTMETA")
 
-    # Characters a family's fonts don't have. Not an error: the editor flags
-    # them before export. Listed so a font change that loses glyphs is noticed.
     if SAMPLE_PDF.exists():
         s, e = find_const(html, "SAMPLE_PDF_B64")
         if base64.b64decode(json.loads(html[s:e])) != SAMPLE_PDF.read_bytes():
-            errors.append(f"SAMPLE_PDF_B64 differs from {SAMPLE_PDF.relative_to(ROOT)}; run 'embed'")
+            errors.append(f"SAMPLE_PDF_B64 differs from {SAMPLE_PDF.relative_to(ROOT)}")
 
+    # Characters a family's fonts don't have. Not an error: the editor flags
+    # them before export. Listed so a font change that loses glyphs is noticed.
     for name, cps in gaps.items():
         log(f"note: {name} lacks {len(cps)} of the requested characters: "
             + " ".join(f"U+{u:04X}" for u in sorted(cps)))
@@ -443,19 +543,21 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name in ("fonts", "all"):
-        p = sub.add_parser(name)
+        p = sub.add_parser(name, help="download and subset fonts" + (", then compile and check" if name == "all" else ""))
         p.add_argument("--ref", help="google/fonts branch, tag or commit (default: googleFontsRef in fonts.json)")
         p.add_argument("--only", nargs="+", metavar="KEY", help="rebuild only these family keys, e.g. inter literata")
         p.add_argument("--refresh", action="store_true", help="download again even if cached")
         p.add_argument("--jobs", type=int, default=None, help="parallel workers (default: CPU count)")
-    sub.add_parser("embed")
-    sub.add_parser("check")
+    p = sub.add_parser("compile", help="build index.html from src/")
+    p.add_argument("--watch", action="store_true", help="recompile whenever a file in src/ changes")
+    p.add_argument("--out", help="write somewhere other than index.html")
+    sub.add_parser("check", help="verify index.html")
     args = ap.parse_args()
 
     if args.cmd in ("fonts", "all"):
         cmd_fonts(args)
-    if args.cmd in ("embed", "all"):
-        cmd_embed(args)
+    if args.cmd in ("compile", "all"):
+        cmd_compile(args)
     if args.cmd in ("check", "all"):
         cmd_check(args)
 

@@ -1,0 +1,61 @@
+<dialog id="docDialog" aria-labelledby="docDlgTitle">
+<form id="docForm" novalidate>
+  <div class="dlg-head">
+    <h2 id="docDlgTitle">Create a new PDF</h2>
+    <button type="button" class="iconbtn" id="docClose" aria-label="Close"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
+  </div>
+  <div class="dlg-body">
+    <p class="small muted" style="margin:0">These settings go into the PDF’s metadata. PDF/UA needs a title and a language, so they come first.</p>
+    <p class="note warnnote" id="dReplaceNote" hidden>A new document replaces the draft kept in this browser. Use Save draft first if you want to keep it.</p>
+    <div class="field"><label for="dTitle">Document title <span class="req">Required</span></label>
+      <input id="dTitle" class="input" type="text" autocomplete="off" aria-describedby="dTitleHelp dTitleErr">
+      <span id="dTitleHelp" class="help">Shown in the title bar and read first by screen readers. Describe the content, not the file.</span>
+      <span id="dTitleErr" class="errtext" hidden>Enter a title for the document.</span></div>
+    <div class="grid2">
+      <div class="field"><label for="dLang">Language <span class="req">Required</span></label><select id="dLang" class="input"></select></div>
+      <div class="field"><label for="dAuthor">Author <span class="help" style="font-weight:400">(optional)</span></label><input id="dAuthor" class="input" type="text" autocomplete="off"></div>
+    </div>
+    <div class="field"><label for="dFont">Default font</label><select id="dFont" class="input" aria-describedby="dFontHelp"></select>
+      <span id="dFontHelp" class="help">Atkinson Hyperlegible Next, the default, was designed for readers with low vision. Any block can use a different font.</span></div>
+    <fieldset class="fs"><legend>Page size</legend>
+      <div class="fs inline" style="margin:0">
+        <label class="choice"><input type="radio" name="dSize" value="A4" checked><span><b>A4</b><span>210 × 297 mm</span></span></label>
+        <label class="choice"><input type="radio" name="dSize" value="Letter"><span><b>US Letter</b><span>8.5 × 11 in</span></span></label>
+      </div>
+    </fieldset>
+    <fieldset class="fs" id="dTemplateWrap"><legend>Start from</legend>
+      <label class="choice"><input type="radio" name="dTemplate" value="blank" checked><span><b>Blank document</b><span>Starts with the title as an H1 heading.</span></span></label>
+      <label class="choice"><input type="radio" name="dTemplate" value="report"><span><b>Report outline</b><span>Title, introduction and three H2 sections to fill in.</span></span></label>
+    </fieldset>
+  </div>
+  <div class="dlg-foot"><span class="push"></span><button type="button" class="btn" id="docCancel">Cancel</button><button type="submit" class="btn primary" id="docDlgSubmit">Create document</button></div>
+</form>
+</dialog>
+
+<dialog id="fontsDialog" aria-labelledby="fontsTitle">
+  <div class="dlg-head"><h2 id="fontsTitle">Font licences</h2><button type="button" class="iconbtn" id="fontsClose" aria-label="Close"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button></div>
+  <div class="dlg-body report" id="fontsBody"></div>
+  <div class="dlg-foot"><button type="button" class="btn push" id="fontsClose2">Close</button></div>
+</dialog>
+
+<dialog id="exportDialog" aria-labelledby="expTitle">
+  <div class="dlg-head">
+    <h2 id="expTitle">Check &amp; export PDF</h2>
+    <button type="button" class="iconbtn" id="expClose" aria-label="Close"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
+  </div>
+  <div class="dlg-body" id="exportBody"></div>
+  <div class="dlg-foot" id="exportFoot"></div>
+</dialog>
+
+<dialog id="reportDialog" aria-labelledby="reportTitle">
+  <div class="dlg-head">
+    <h2 id="reportTitle">Accessibility report</h2>
+    <button type="button" class="iconbtn" id="closeReport" aria-label="Close report"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
+  </div>
+  <div class="dlg-body report" id="reportBody"></div>
+  <div class="dlg-foot">
+    <button type="button" class="btn primary" id="downloadReport" hidden>Download report (HTML)</button>
+    <span class="small muted" id="downloadNote"></span>
+    <button type="button" class="btn push" id="closeReport2">Close</button>
+  </div>
+</dialog>
