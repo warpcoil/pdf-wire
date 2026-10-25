@@ -1,0 +1,164 @@
+{
+  "googleFontsRef": "main",
+  "weights": {
+    "R": 400,
+    "B": 700
+  },
+  "unicodes": [
+    "U+0020-007E",
+    "U+00A0-017F",
+    "U+2013",
+    "U+2014",
+    "U+2018",
+    "U+2019",
+    "U+201C",
+    "U+201D",
+    "U+2022",
+    "U+2026",
+    "U+20AC",
+    "U+2122",
+    "U+2192"
+  ],
+  "families": [
+    {
+      "key": "atkinson",
+      "name": "Atkinson Hyperlegible Next",
+      "cat": "sans",
+      "blurb": "Designed by the Braille Institute for readers with low vision",
+      "gf": "atkinsonhyperlegiblenext"
+    },
+    {
+      "key": "inter",
+      "name": "Inter",
+      "cat": "sans",
+      "blurb": "Clear screen-and-print workhorse",
+      "gf": "inter"
+    },
+    {
+      "key": "opensans",
+      "name": "Open Sans",
+      "cat": "sans",
+      "blurb": "Friendly, very readable humanist sans",
+      "gf": "opensans"
+    },
+    {
+      "key": "notosans",
+      "name": "Noto Sans",
+      "cat": "sans",
+      "blurb": "Neutral, wide language support",
+      "gf": "notosans"
+    },
+    {
+      "key": "roboto",
+      "name": "Roboto",
+      "cat": "sans",
+      "blurb": "Familiar from Android and Google",
+      "gf": "roboto"
+    },
+    {
+      "key": "publicsans",
+      "name": "Public Sans",
+      "cat": "sans",
+      "blurb": "From the US Web Design System",
+      "gf": "publicsans"
+    },
+    {
+      "key": "worksans",
+      "name": "Work Sans",
+      "cat": "sans",
+      "blurb": "Open, slightly wider grotesque",
+      "gf": "worksans"
+    },
+    {
+      "key": "figtree",
+      "name": "Figtree",
+      "cat": "sans",
+      "blurb": "Clean geometric sans",
+      "gf": "figtree"
+    },
+    {
+      "key": "redhattext",
+      "name": "Red Hat Text",
+      "cat": "sans",
+      "blurb": "Tuned for small sizes",
+      "gf": "redhattext"
+    },
+    {
+      "key": "librefranklin",
+      "name": "Libre Franklin",
+      "cat": "sans",
+      "blurb": "Classic American gothic",
+      "gf": "librefranklin"
+    },
+    {
+      "key": "nunitosans",
+      "name": "Nunito Sans",
+      "cat": "sans",
+      "blurb": "Soft, approachable sans",
+      "gf": "nunitosans"
+    },
+    {
+      "key": "literata",
+      "name": "Literata",
+      "cat": "serif",
+      "blurb": "Designed for long reading",
+      "gf": "literata"
+    },
+    {
+      "key": "sourceserif",
+      "name": "Source Serif 4",
+      "cat": "serif",
+      "blurb": "Sturdy text serif",
+      "gf": "sourceserif4"
+    },
+    {
+      "key": "notoserif",
+      "name": "Noto Serif",
+      "cat": "serif",
+      "blurb": "Neutral serif, wide language support",
+      "gf": "notoserif"
+    },
+    {
+      "key": "ebgaramond",
+      "name": "EB Garamond",
+      "cat": "serif",
+      "blurb": "Traditional book face",
+      "gf": "ebgaramond"
+    },
+    {
+      "key": "newsreader",
+      "name": "Newsreader",
+      "cat": "serif",
+      "blurb": "Editorial text serif",
+      "gf": "newsreader"
+    },
+    {
+      "key": "alegreya",
+      "name": "Alegreya",
+      "cat": "serif",
+      "blurb": "Calligraphic literary serif",
+      "gf": "alegreya"
+    },
+    {
+      "key": "jetbrainsmono",
+      "name": "JetBrains Mono",
+      "cat": "mono",
+      "blurb": "Monospaced, for code",
+      "gf": "jetbrainsmono"
+    },
+    {
+      "key": "robotomono",
+      "name": "Roboto Mono",
+      "cat": "mono",
+      "blurb": "Monospaced, for code and data",
+      "gf": "robotomono"
+    },
+    {
+      "key": "redhatmono",
+      "name": "Red Hat Mono",
+      "cat": "mono",
+      "blurb": "Monospaced, compact",
+      "gf": "redhatmono"
+    }
+  ]
+}

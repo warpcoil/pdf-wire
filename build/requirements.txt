@@ -1,0 +1,2 @@
+# Python 3.9+ ; install with:  pip install -r build/requirements.txt
+fonttools==4.66.1
