@@ -1,7 +1,7 @@
 # Accessible PDF Editor
 
-[!WARNING]
-Caution Advised: Built with AI using newer vibe technologies.
+> [!WARNING]
+> Caution Advised: Built with AI using newer vibe technologies.
 
 A web application for creating PDFs that conform to **WCAG 2.2 AA** and **PDF/UA-1**, and for checking existing PDFs against the same rules.
 
