@@ -1,5 +1,8 @@
 # Accessible PDF Editor
 
+[!WARNING]
+Caution Advised: Built with AI using newer vibe technologies.
+
 A web application for creating PDFs that conform to **WCAG 2.2 AA** and **PDF/UA-1**, and for checking existing PDFs against the same rules.
 
 Most PDF tools treat accessibility as a clean-up step after the document is finished. This editor works the other way round: the document's structure (headings, lists, tables, images with alternative text) is built as you write. Every export is re-checked, and a PDF is only released when it passes.
