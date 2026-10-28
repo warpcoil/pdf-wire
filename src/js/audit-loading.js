@@ -3,7 +3,7 @@ async function openBytes(bytes, name) {
   if (!pdfjsLib) { showError('The PDF engine did not load. Check your connection and reload the page.'); return; }
   const seq = ++state.loadSeq;
   if (state.pdf) { try { state.pdf.destroy(); } catch (e) { /* ignore */ } }
-  Object.assign(state, { pdf: null, fileName: name, pages: [], nodes: new Map(), ordered: [], doc: null, findings: [], results: [], byNode: new Map(), pageIndex: 0, zoom: 1, selected: null, selectedFinding: null, manual: {} });
+  Object.assign(state, { pdf: null, bytes: bytes.slice(), fileName: name, pages: [], nodes: new Map(), ordered: [], doc: null, findings: [], results: [], byNode: new Map(), pageIndex: 0, zoom: 1, selected: null, selectedFinding: null, manual: {} });
   setMode('audit');
   $('#viewer').hidden = true; $('#reportBtn').disabled = true;
   $('#tree').replaceChildren(); $('#treeHint').textContent = 'Reading the tag tree…';

@@ -322,7 +322,7 @@ async function buildPdf(d, opts) {
 
   const iso = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
   const pdfDate = 'D:' + iso.replace(/[-:T]/g, '').replace('Z', '') + 'Z';
-  const producer = 'Accessible PDF Editor (test build)';
+  const producer = 'PDF Wire (test build 6)';
   const xmp = '<?xpacket begin="\uFEFF" id="W5M0MpCehiHzreSzNTczkc9d"?>\n<x:xmpmeta xmlns:x="adobe:ns:meta/">\n<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n' +
     '<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:pdf="http://ns.adobe.com/pdf/1.3/" xmlns:xmp="http://ns.adobe.com/xap/1.0/" xmlns:pdfuaid="http://www.aiim.org/pdfua/ns/id/">\n' +
     '<dc:format>application/pdf</dc:format>\n<dc:title><rdf:Alt><rdf:li xml:lang="x-default">' + xmlEsc(d.title) + '</rdf:li></rdf:Alt></dc:title>\n' +

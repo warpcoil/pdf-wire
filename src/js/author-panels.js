@@ -42,8 +42,13 @@ function renderAuthorChecks() {
       el('dt', {}, 'Page size'), el('dd', {}, d.pageSize === 'Letter' ? 'US Letter' : 'A4'),
       d.author ? [el('dt', {}, 'Author'), el('dd', {}, d.author)] : null),
     el('button', { type: 'button', class: 'btn link', style: 'margin-top:6px;padding:0', onclick: () => openDocDialog('edit') }, 'Edit document settings')));
+  renderRemediationPanel();
 }
 function goToFinding(f) {
+  if (f.remItem && author.doc.remediation && !f.blockId) {
+    const it = author.doc.remediation.items.find((x) => x.id === f.remItem);
+    if (it) { goToRemItem(it, true); return; }
+  }
   if (f.blockId) {
     selectBlock(f.blockId);
     const b = findBlock(f.blockId);
@@ -108,11 +113,7 @@ function renderProps() {
   const b = findBlock(author.sel);
   if (!b) { host.append(el('h2', {}, 'Properties'), el('p', { class: 'small muted', style: 'margin:6px 0 0' }, 'Select a block to see its properties, or use Insert to add one.')); return; }
   host.append(el('div', { class: 'props-head' }, el('h2', {}, blockName(b)), chip(blockTag(b))));
-  if (b.type === 'heading') {
-    const sel = el('select', { id: 'propLevel', class: 'input' }, [1, 2, 3, 4, 5, 6].map((l) => el('option', { value: String(l), selected: l === b.level ? true : null }, 'H' + l + (l === 1 ? ' (document title)' : ''))));
-    sel.addEventListener('change', () => { b.level = +sel.value; changed('all'); refocus('propLevel'); announce('Heading level ' + b.level + '.'); });
-    host.append(field('Heading level', sel, 'Use one H1 for the title, then H2 for sections and H3 inside them. Don’t skip levels.'));
-  }
+  blockTypeTools(b, host);
   if (b.type === 'list') {
     const m = el('select', { id: 'propMarker', class: 'input' }, MARKERS.map(([k, n]) => el('option', { value: k, selected: b.marker === k ? true : null }, n)));
     m.addEventListener('change', () => { b.marker = m.value; changed('sheet'); refocus('propMarker'); });
@@ -182,9 +183,11 @@ function renderProps() {
       chk('tStripes', 'Stripe alternate rows', 'stripes')));
     host.append(el('div', { class: 'srprev', id: 'tPrev' }));
     renderTablePreview(b);
+    host.append(tableTools(b));
   }
   if (b.type === 'pagebreak') host.append(el('p', { class: 'small muted', style: 'margin:10px 0 0' }, 'The next block starts on a new page. Page breaks are layout only and aren’t announced.'));
   if (TEXTY(b)) host.append(styleSection(b));
+  const jt = joinTools(b); if (jt) host.append(jt);
   host.append(el('div', { class: 'blockacts' },
     el('button', { type: 'button', class: 'btn', onclick: () => moveBlock(-1) }, 'Move up'),
     el('button', { type: 'button', class: 'btn', onclick: () => moveBlock(1) }, 'Move down'),
@@ -227,7 +230,11 @@ function submitDocDialog(e) {
   const s = { title, lang: $('#dLang').value, author: $('#dAuthor').value.trim(), font: $('#dFont').value, pageSize: document.querySelector('input[name="dSize"]:checked').value,
     template: (document.querySelector('input[name="dTemplate"]:checked') || {}).value || 'blank' };
   $('#docDialog').close();
-  if (author.dialogMode === 'edit' && author.doc) { Object.assign(author.doc, { title: s.title, lang: s.lang, author: s.author, pageSize: s.pageSize, font: s.font }); changed('all'); announce('Document settings saved.'); }
+  if (author.dialogMode === 'edit' && author.doc) {
+    Object.assign(author.doc, { title: s.title, lang: s.lang, author: s.author, pageSize: s.pageSize, font: s.font });
+    const rem = author.doc.remediation; if (rem) rem.items.forEach((it) => { if (it.kind === 'meta') it.done = true; });
+    changed('all'); announce('Document settings saved.');
+  }
   else startNewDocument(s);
 }
 

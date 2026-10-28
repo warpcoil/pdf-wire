@@ -49,6 +49,7 @@ INDEX = ROOT / "index.html"
 OFL_TXT = ROOT / "OFL.txt"
 FONT_LICENSES = ROOT / "FONT-LICENSES.md"
 SAMPLE_PDF = ROOT / "examples" / "riverside-sample-with-problems.pdf"
+REMEDIATE_SAMPLE = ROOT / "examples" / "remediation" / "untagged-council-report.pdf"
 
 RAW = "https://raw.githubusercontent.com/google/fonts/{ref}/ofl/{dir}/{file}"
 
@@ -346,15 +347,17 @@ DIRECTIVE = re.compile(r"^[ \t]*<!--\s*@(include|generated)\s+(\S+)\s*-->[ \t]*$
 
 
 def generated_data() -> str:
-    """The three data constants, one per line, as the app expects them."""
+    """The data constants, one per line, as the app expects them."""
     for p in (FONTDATA_JSON, FONTMETA_JSON):
         if not p.exists():
             raise SystemExit(f"{p.relative_to(ROOT)} missing; run 'python build/build.py fonts'")
     fontdata = json.loads(read_text(FONTDATA_JSON))
     fontmeta = json.loads(read_text(FONTMETA_JSON))
     sample = base64.b64encode(SAMPLE_PDF.read_bytes()).decode("ascii")
+    rsample = base64.b64encode(REMEDIATE_SAMPLE.read_bytes()).decode("ascii")
     return (
         f"const SAMPLE_PDF_B64 = {json.dumps(sample)};\n"
+        f"const REMEDIATE_SAMPLE_B64 = {json.dumps(rsample)};\n"
         f"const FONTDATA = {json.dumps(fontdata, ensure_ascii=False)};\n"
         f"const FONTMETA = {json.dumps(fontmeta, ensure_ascii=False)};\n"
     )
@@ -365,7 +368,7 @@ def compile_html() -> tuple[str, list[Path]]:
 
     Directives must stand alone on a line:
       <!-- @include css/base.css -->   replaced by that file, verbatim
-      <!-- @generated data -->         replaced by SAMPLE_PDF_B64, FONTDATA, FONTMETA
+      <!-- @generated data -->         replaced by SAMPLE_PDF_B64, REMEDIATE_SAMPLE_B64, FONTDATA, FONTMETA
     """
     used: list[Path] = [TEMPLATE]
     out: list[str] = []
@@ -384,7 +387,7 @@ def compile_html() -> tuple[str, list[Path]]:
             used.append(path)
         elif arg == "data":
             out.append(generated_data())
-            used += [FONTDATA_JSON, FONTMETA_JSON, SAMPLE_PDF]
+            used += [FONTDATA_JSON, FONTMETA_JSON, SAMPLE_PDF, REMEDIATE_SAMPLE]
         else:
             raise SystemExit(f"src/index.html:{n}: unknown @generated '{arg}'")
     return "".join(out), used
@@ -415,7 +418,7 @@ def cmd_compile(args) -> None:
     log("watching src/ for changes (Ctrl+C to stop)")
 
     def snapshot() -> dict:
-        files = [p for p in SRC.rglob("*") if p.is_file()] + [SAMPLE_PDF]
+        files = [p for p in SRC.rglob("*") if p.is_file()] + [SAMPLE_PDF, REMEDIATE_SAMPLE]
         return {p: p.stat().st_mtime_ns for p in files if p.exists()}
 
     last = snapshot()
@@ -524,6 +527,10 @@ def cmd_check(args) -> None:
         s, e = find_const(html, "SAMPLE_PDF_B64")
         if base64.b64decode(json.loads(html[s:e])) != SAMPLE_PDF.read_bytes():
             errors.append(f"SAMPLE_PDF_B64 differs from {SAMPLE_PDF.relative_to(ROOT)}")
+    if REMEDIATE_SAMPLE.exists():
+        s, e = find_const(html, "REMEDIATE_SAMPLE_B64")
+        if base64.b64decode(json.loads(html[s:e])) != REMEDIATE_SAMPLE.read_bytes():
+            errors.append(f"REMEDIATE_SAMPLE_B64 differs from {REMEDIATE_SAMPLE.relative_to(ROOT)}")
 
     # Characters a family's fonts don't have. Not an error: the editor flags
     # them before export. Listed so a font change that loses glyphs is noticed.

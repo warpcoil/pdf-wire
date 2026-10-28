@@ -6,6 +6,7 @@
   --ok:#0A5560; --ok-bg:#E2F0F1; --ok-line:#B5D6DA;
   --bar:#16181D; --bar-ink:#F3F4F6; --bar-muted:#C9CDD4; --bar-btn:#22262D; --bar-line:#3A3F49;
   --t-h:#2148C0; --t-p:#5B6472; --t-fig:#6A3DB8; --t-table:#0B6B78; --t-link:#8A5300; --t-list:#9B3D12; --t-other:#3F4652;
+  --chrome:#FFFFFF; --raised:#FFFFFF; --line-2:#BFC5CD; --shadow:rgba(22,24,29,.16); --sel:#EEF2FD;
   --focus:#2148C0;
   color-scheme: light;
   box-sizing:border-box;
@@ -20,6 +21,7 @@
     --warn:#F1C978; --warn-icon:#E3B35A; --warn-bg:#33280F; --warn-line:#5C4818;
     --ok:#8AD6DB; --ok-bg:#12312F; --ok-line:#22504D;
     --bar:#0A0B0D; --bar-ink:#E8EAED; --bar-muted:#A9B0BB; --bar-btn:#1B1E23; --bar-line:#33373F;
+    --chrome:#16181D; --raised:#1E2127; --line-2:#3A3F49; --shadow:rgba(0,0,0,.45); --sel:#1E2742;
     --focus:#8EA8F7;
     color-scheme: dark;
   }
@@ -31,17 +33,18 @@
   --warn:#F1C978; --warn-icon:#E3B35A; --warn-bg:#33280F; --warn-line:#5C4818;
   --ok:#8AD6DB; --ok-bg:#12312F; --ok-line:#22504D;
   --bar:#0A0B0D; --bar-ink:#E8EAED; --bar-muted:#A9B0BB; --bar-btn:#1B1E23; --bar-line:#33373F;
+  --chrome:#16181D; --raised:#1E2127; --line-2:#3A3F49; --shadow:rgba(0,0,0,.45); --sel:#1E2742;
   --focus:#8EA8F7;
   color-scheme: dark;
 }
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);
-  font:14px/1.45 'IBM Plex Sans','Segoe UI',system-ui,-apple-system,sans-serif}
+  font:13.5px/1.45 'Inter','Segoe UI',system-ui,-apple-system,sans-serif}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 [hidden]{display:none!important}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
-.mono{font-family:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace}
+.mono{font-family:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace}
 svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 

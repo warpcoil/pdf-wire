@@ -97,11 +97,20 @@ function setMode(m) {
   if (m === 'home') renderHome();
   updateHeader();
 }
+/* the Write / Pages / Check / Remediate tabs in the header */
+function updateModeTabs() {
+  const m = state.mode, v = author.view;
+  const on = { modeWrite: m === 'author' && v === 'write', modePages: m === 'author' && v === 'pages', modeCheck: m === 'audit', modeRemediate: m === 'retag' };
+  for (const [id, val] of Object.entries(on)) { const b = document.getElementById(id); if (b) b.setAttribute('aria-pressed', val ? 'true' : 'false'); }
+  const pages = document.getElementById('modePages'); if (pages) pages.disabled = !author.doc;
+}
 function updateHeader() {
   const m = state.mode;
-  $('#fileName').textContent = m === 'author' ? (author.doc ? author.doc.title || 'Untitled document' : '') : m === 'audit' ? state.fileName : 'No file open';
+  $('#fileName').textContent = m === 'author' ? (author.doc ? author.doc.title || 'Untitled document' : '') : m === 'audit' ? state.fileName : m === 'retag' ? (rt.T ? rt.T.name : '') : 'No file open';
   $('#backToEdit').hidden = !(m === 'audit' && author.doc);
+  $('#backToRetag').hidden = !(m === 'audit' && rt.T);
   const c = $('#saveChip'); if (c) c.textContent = author.saveNote || '';
+  updateModeTabs();
 }
 function renderHome() {
   const host = $('#homeDraft'); if (!host) return;

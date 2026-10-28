@@ -1,11 +1,17 @@
 <header class="appbar">
-  <div class="brand">
-    <svg class="i" viewBox="0 0 28 28" width="26" height="26" aria-hidden="true" style="width:26px;height:26px;stroke-width:1.6"><path d="M6 3h11l5 5v17H6z"/><path d="M17 3v5h5"/><path d="M10 13h8"/><path d="M10 17h5"/><path d="M10 21h8"/></svg>
-    <h1>Accessible PDF Editor</h1>
-    <span class="phase">Test build 5</span>
-  </div>
+  <button type="button" class="brand" id="homeBtn" aria-label="PDF Wire, home">
+    <svg viewBox="0 0 150 40" width="105" height="28" aria-hidden="true" focusable="false" class="logo"><g fill="none" stroke-linejoin="round"><path d="M8 4h16l8 8v24H8z" class="logo-ink"/><path d="M24 4v8h8" class="logo-ink"/><rect x="12.5" y="16.5" width="15" height="6" rx="1" class="logo-tag"/><path d="M12.5 28h15" class="logo-ink"/></g><g class="logo-word"><path d="M45.44 28.0V11.97H52.33Q54.06 11.97 55.47 12.5Q56.89 13.04 57.73 14.18Q58.57 15.33 58.57 17.14Q58.57 18.95 57.73 20.1Q56.89 21.25 55.47 21.78Q54.06 22.32 52.33 22.32H48.95V28.0ZM48.95 19.34H52.25Q53.39 19.34 54.15 18.84Q54.91 18.34 54.91 17.14Q54.91 15.94 54.15 15.44Q53.39 14.95 52.25 14.95H48.95ZM60.34 28.0V11.97H65.45Q67.5 11.97 69.19 12.4Q70.87 12.83 72.1 13.77Q73.32 14.72 73.98 16.25Q74.64 17.77 74.64 19.98Q74.64 22.23 73.97 23.76Q73.3 25.3 72.07 26.24Q70.83 27.17 69.16 27.58Q67.48 28.0 65.45 28.0ZM63.84 25.05H65.5Q66.69 25.05 67.7 24.84Q68.71 24.63 69.45 24.09Q70.19 23.55 70.61 22.56Q71.03 21.56 71.03 19.98Q71.03 18.41 70.61 17.4Q70.19 16.4 69.44 15.85Q68.69 15.29 67.69 15.09Q66.69 14.88 65.5 14.88H63.84ZM76.65 28.0V11.97H87.92V15.04H80.15V18.8H87.83V21.88H80.15V28.0ZM100.15 28.0 96.25 11.97H99.8L102.2 23.48L104.66 11.97H108.35L110.83 23.48L113.23 11.97H116.77L112.88 28.0H109.07L106.5 16.35L103.95 28.0ZM119.38 28.0V18.64H117.45V16.1H122.74V28.0ZM120.87 14.07Q120.04 14.07 119.44 13.47Q118.84 12.87 118.84 12.04Q118.84 11.18 119.44 10.59Q120.04 10.01 120.87 10.01Q121.73 10.01 122.32 10.6Q122.91 11.19 122.91 12.04Q122.91 12.87 122.32 13.47Q121.73 14.07 120.87 14.07ZM125.3 28.0V16.1H127.92L128.56 18.28Q128.96 17.37 129.51 16.81Q130.06 16.25 130.81 16Q131.55 15.75 132.48 15.79V19.14Q131.18 19.01 130.33 19.29Q129.48 19.57 129.06 20.28Q128.64 20.99 128.64 22.17V28.0ZM139.87 28.29Q137.96 28.29 136.52 27.52Q135.08 26.75 134.28 25.34Q133.48 23.92 133.48 21.99Q133.48 20.1 134.33 18.71Q135.19 17.32 136.61 16.55Q138.04 15.79 139.75 15.79Q141.2 15.79 142.36 16.32Q143.52 16.86 144.31 17.82Q145.11 18.79 145.48 20.1Q145.86 21.41 145.74 22.93H136.78Q136.91 23.68 137.21 24.19Q137.51 24.71 137.92 25.03Q138.34 25.36 138.83 25.51Q139.31 25.65 139.8 25.65Q140.67 25.65 141.29 25.39Q141.92 25.12 142.27 24.71L144.99 25.68Q144.11 26.98 142.74 27.64Q141.38 28.29 139.87 28.29ZM136.76 20.84H142.59Q142.55 20.05 142.18 19.49Q141.81 18.93 141.21 18.62Q140.61 18.31 139.83 18.31Q139.13 18.31 138.49 18.56Q137.84 18.8 137.4 19.35Q136.95 19.9 136.76 20.84Z"/></g></svg>
+    <span class="phase">Test build 6</span>
+  </button>
+  <nav class="modes" aria-label="Mode">
+    <button type="button" class="modetab" id="modeWrite" aria-pressed="false">Write</button>
+    <button type="button" class="modetab" id="modePages" aria-pressed="false">Pages</button>
+    <button type="button" class="modetab" id="modeCheck" aria-pressed="false">Check</button>
+    <button type="button" class="modetab" id="modeRemediate" aria-pressed="false">Remediate</button>
+  </nav>
   <span class="filename" id="fileName">No file open</span>
   <span class="chipnote only-author" id="saveChip"></span>
+  <span class="chipnote warnchip only-retag">Tag in place · experimental</span>
   <div class="bar-actions">
     <button type="button" class="btn dark" id="newBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3h7l3 3v11H5z"/><path d="M10 9v5M7.5 11.5h5"/></svg>New</button>
     <span class="btn dark file-btn">
@@ -13,44 +19,157 @@
       <span aria-hidden="true">Open</span>
       <input type="file" id="fileInput" accept="application/pdf,.pdf,.pwj,application/json,.json" aria-label="Open a PDF or a .pwj draft">
     </span>
-    <button type="button" class="btn dark only-audit" id="sampleBtn">Open sample PDF</button>
-    <button type="button" class="btn dark only-audit" id="backToEdit" hidden>Back to editing</button>
     <button type="button" class="btn primary only-audit" id="reportBtn" disabled>Accessibility report</button>
     <button type="button" class="btn dark only-author" id="saveDraftBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4h9.5L16 6.5V16H4z"/><path d="M7 4v4h6V4"/><path d="M7 16v-5h6v5"/></svg>Save draft</button>
-    <button type="button" class="btn primary only-author" id="exportBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v10"/><path d="M6 7l4-4 4 4"/><path d="M4 13v3h12v-3"/></svg>Check &amp; export PDF</button>
+    <button type="button" class="btn primary only-author" id="exportBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v10"/><path d="M6 7l4-4 4 4"/><path d="M4 13v3h12v-3"/></svg>Check &amp; export</button>
+    <button type="button" class="btn dark only-retag" id="rtCancel">Close</button>
+    <button type="button" class="btn primary only-retag" id="rtWrite"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v10"/><path d="M6 7l4-4 4 4"/><path d="M4 13v3h12v-3"/></svg>Write tagged PDF</button>
   </div>
+  <input type="file" id="checkInput" accept="application/pdf,.pdf" hidden>
+  <input type="file" id="remInput" accept="application/pdf,.pdf" hidden>
 </header>
 
-<div class="toolbar only-audit" role="toolbar" aria-label="View controls">
-  <div class="tgroup">
-    <button type="button" class="iconbtn" id="prevPage" aria-label="Previous page" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M12 6l-4 4 4 4"/></svg></button>
-    <span class="num" id="pageLabel" aria-live="polite">Page – of –</span>
-    <button type="button" class="iconbtn" id="nextPage" aria-label="Next page" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 6l4 4-4 4"/></svg></button>
+<!-- Check: viewing an existing PDF's tags -->
+<div class="toolbar only-audit" role="toolbar" aria-label="Check tools">
+  <div class="tbgroup" role="group" aria-labelledby="tgPageLbl">
+    <div class="tbrow">
+      <button type="button" class="iconbtn" id="prevPage" aria-label="Previous page" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M12 6l-4 4 4 4"/></svg></button>
+      <span class="num" id="pageLabel" aria-live="polite">Page – of –</span>
+      <button type="button" class="iconbtn" id="nextPage" aria-label="Next page" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 6l4 4-4 4"/></svg></button>
+    </div>
+    <span class="tblabel" id="tgPageLbl">Page</span>
   </div>
-  <div class="tgroup">
-    <button type="button" class="iconbtn" id="zoomOut" aria-label="Zoom out" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10"/></svg></button>
-    <span class="num" id="zoomLabel" style="min-width:48px;text-align:center">100%</span>
-    <button type="button" class="iconbtn" id="zoomIn" aria-label="Zoom in" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10"/><path d="M10 5v10"/></svg></button>
-    <button type="button" class="btn link" id="zoomFit" disabled>Fit width</button>
+  <div class="tbgroup" role="group" aria-labelledby="tgZoomLbl">
+    <div class="tbrow">
+      <button type="button" class="iconbtn" id="zoomOut" aria-label="Zoom out" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10"/></svg></button>
+      <span class="num" id="zoomLabel" style="min-width:48px;text-align:center">100%</span>
+      <button type="button" class="iconbtn" id="zoomIn" aria-label="Zoom in" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10"/><path d="M10 5v10"/></svg></button>
+      <button type="button" class="btn link" id="zoomFit" disabled>Fit width</button>
+    </div>
+    <span class="tblabel" id="tgZoomLbl">Zoom</span>
   </div>
-  <label class="check"><input type="checkbox" id="showTags" checked> <span>Show tags</span></label>
-  <label class="check"><input type="checkbox" id="showOrder" checked> <span>Show reading order</span></label>
-  <label class="check"><input type="checkbox" id="showUntagged" checked> <span>Show untagged content</span></label>
+  <div class="tbgroup" role="group" aria-labelledby="tgShowLbl">
+    <div class="tbrow">
+      <label class="tgchk"><input type="checkbox" id="showTags" checked><span>Tags</span></label>
+      <label class="tgchk"><input type="checkbox" id="showOrder" checked><span>Reading order</span></label>
+      <label class="tgchk"><input type="checkbox" id="showUntagged" checked><span>Untagged content</span></label>
+    </div>
+    <span class="tblabel" id="tgShowLbl">Show</span>
+  </div>
+  <div class="tbgroup tbend" role="group" aria-label="This PDF">
+    <div class="tbrow">
+      <button type="button" class="btn dark" id="backToEdit" hidden>Back to editing</button>
+      <button type="button" class="btn dark" id="backToRetag" hidden>Back to tagging</button>
+      <button type="button" class="btn dark" id="sampleBtn">Open sample PDF</button>
+      <button type="button" class="btn primary" id="remediateBtn">Remediate this PDF</button>
+    </div>
+  </div>
 </div>
 
-<div class="toolbar only-author" role="toolbar" aria-label="Insert">
-  <div class="viewseg" role="group" aria-label="View"><button type="button" id="viewWrite" aria-pressed="true">Write</button><button type="button" id="viewPages" aria-pressed="false">Pages</button></div>
-  <span class="tsep" aria-hidden="true"></span>
-  <span class="tlabel" aria-hidden="true">Insert</span>
-  <div class="split">
-    <button type="button" class="ins" data-insert="heading"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4v12M12 4v12M4 10h8"/><path d="M15 9l2-1v8"/></svg>Heading</button>
-    <label for="insLevel" class="sr-only">Level for new headings</label>
-    <select id="insLevel"><option value="2">H2</option><option value="1">H1</option><option value="3">H3</option><option value="4">H4</option><option value="5">H5</option><option value="6">H6</option></select>
+<!-- Remediate: tag in place -->
+<div class="toolbar only-retag" role="toolbar" aria-label="Tag tools">
+  <div class="tbgroup" role="group" aria-labelledby="rgHistLbl">
+    <div class="tbrow">
+      <button type="button" class="tb" id="rtUndo" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5L3 9l4 4"/><path d="M3 9h9a5 5 0 0 1 0 10h-2"/></svg>Undo</button>
+      <button type="button" class="tb" id="rtRedo" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M13 5l4 4-4 4"/><path d="M17 9H8a5 5 0 0 0 0 10h2"/></svg>Redo</button>
+    </div>
+    <span class="tblabel" id="rgHistLbl">History</span>
   </div>
-  <button type="button" class="ins" data-insert="paragraph"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 5h12M4 9h12M4 13h12M4 17h7"/></svg>Paragraph</button>
-  <button type="button" class="ins" data-insert="list"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 5h9M8 10h9M8 15h9"/><path d="M4 5h.1M4 10h.1M4 15h.1"/></svg>List</button>
-  <button type="button" class="ins" data-insert="image"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="1.5"/><circle cx="7.5" cy="8.5" r="1.5"/><path d="M3.5 14.5l4-4 3 3 2-2 4 4"/></svg>Image</button>
-  <button type="button" class="ins" data-insert="table"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="1"/><path d="M3 8h14M3 12h14M8 4v12"/></svg>Table</button>
-  <button type="button" class="ins" data-insert="pagebreak"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h3M8 10h4M14 10h3"/><path d="M5 4h10v3M5 16h10v-3"/></svg>Page break</button>
+  <div class="tbgroup" role="group" aria-labelledby="rgTagLbl">
+    <div class="tbrow" id="rtTagAs">
+      <button type="button" class="tagbtn" data-role="H1">H1</button>
+      <button type="button" class="tagbtn" data-role="H2">H2</button>
+      <button type="button" class="tagbtn" data-role="H3">H3</button>
+      <label for="rtTagMore" class="sr-only">More heading levels</label>
+      <select id="rtTagMore" class="tagsel"><option value="">H4–H6</option><option value="H4">H4</option><option value="H5">H5</option><option value="H6">H6</option></select>
+      <button type="button" class="tagbtn" data-role="P">P</button>
+      <button type="button" class="tagbtn" data-role="L">List</button>
+      <button type="button" class="tagbtn" data-role="Table">Table</button>
+      <button type="button" class="tagbtn" data-role="Figure">Figure</button>
+      <button type="button" class="tagbtn art" data-role="Artifact">Artifact</button>
+    </div>
+    <span class="tblabel" id="rgTagLbl">Tag as</span>
+  </div>
+  <div class="tbgroup" role="group" aria-labelledby="rgArrLbl">
+    <div class="tbrow">
+      <button type="button" class="tb" id="rtCombineBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4h12"/><path d="M4 16h12"/><path d="M10 6v8"/><path d="M7 11l3 3 3-3"/></svg>Combine</button>
+      <button type="button" class="tb" id="rtSplitBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12"/><path d="M10 3v4M10 13v4"/><path d="M7 5l3-2 3 2M7 15l3 2 3-2"/></svg>Split</button>
+      <button type="button" class="tb" id="rtUpBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4"/><path d="M5 9l5-5 5 5"/></svg>Move up</button>
+      <button type="button" class="tb" id="rtDownBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12"/><path d="M5 11l5 5 5-5"/></svg>Move down</button>
+    </div>
+    <span class="tblabel" id="rgArrLbl">Arrange</span>
+  </div>
+  <div class="tbgroup" role="group" aria-labelledby="rgImgLbl">
+    <div class="tbrow">
+      <button type="button" class="tb" id="rtDescribe"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="1.5"/><circle cx="7.5" cy="8.5" r="1.5"/><path d="M3.5 14.5l4-4 3 3 2-2 4 4"/></svg>Describe</button>
+    </div>
+    <span class="tblabel" id="rgImgLbl">Images</span>
+  </div>
+  <div class="tbgroup" role="group" aria-labelledby="rgViewLbl">
+    <div class="tbrow">
+      <button type="button" class="iconbtn" id="rtPrev" aria-label="Previous page" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M12 6l-4 4 4 4"/></svg></button>
+      <span class="num" id="rtPageLabel" aria-live="polite">Page – of –</span>
+      <button type="button" class="iconbtn" id="rtNext" aria-label="Next page" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 6l4 4-4 4"/></svg></button>
+      <button type="button" class="iconbtn" id="rtZoomOut" aria-label="Zoom out"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10"/></svg></button>
+      <span class="num" id="rtZoomLabel" style="min-width:44px;text-align:center">100%</span>
+      <button type="button" class="iconbtn" id="rtZoomIn" aria-label="Zoom in"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10"/><path d="M10 5v10"/></svg></button>
+      <label class="tgchk"><input type="checkbox" id="rtShowTags" checked><span>Tags</span></label>
+      <label class="tgchk"><input type="checkbox" id="rtShowOrder" checked><span>Order</span></label>
+      <label class="tgchk"><input type="checkbox" id="rtShowArt" checked><span>Artifacts</span></label>
+    </div>
+    <span class="tblabel" id="rgViewLbl">View</span>
+  </div>
+  <div class="tbgroup tbend" role="group" aria-labelledby="rgLayLbl">
+    <div class="seg2" id="rtLayout">
+      <button type="button" data-layout="original" aria-pressed="false">Original</button>
+      <button type="button" data-layout="tagged" aria-pressed="false">Tagged</button>
+      <button type="button" data-layout="both" aria-pressed="true">Side by side</button>
+    </div>
+    <span class="tblabel" id="rgLayLbl">Layout</span>
+  </div>
 </div>
 
+<!-- Write and Pages -->
+<div class="toolbar only-author" role="toolbar" aria-label="Editing tools">
+  <div class="tbgroup" role="group" aria-labelledby="agHistLbl">
+    <div class="tbrow">
+      <button type="button" class="tb" id="undoBtn" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5L3 9l4 4"/><path d="M3 9h9a5 5 0 0 1 0 10h-2"/></svg>Undo</button>
+      <button type="button" class="tb" id="redoBtn" disabled><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M13 5l4 4-4 4"/><path d="M17 9H8a5 5 0 0 0 0 10h2"/></svg>Redo</button>
+    </div>
+    <span class="tblabel" id="agHistLbl">History</span>
+  </div>
+  <div class="tbgroup" role="group" aria-labelledby="agInsLbl">
+    <div class="tbrow">
+      <span class="insw split" draggable="true" data-drag-insert="heading"><span class="grip" aria-hidden="true">⠿</span><button type="button" class="ins" data-insert="heading">Heading</button>
+        <label for="insLevel" class="sr-only">Level for new headings</label>
+        <select id="insLevel"><option value="2">H2</option><option value="1">H1</option><option value="3">H3</option><option value="4">H4</option><option value="5">H5</option><option value="6">H6</option></select></span>
+      <span class="insw" draggable="true" data-drag-insert="paragraph"><span class="grip" aria-hidden="true">⠿</span><button type="button" class="ins" data-insert="paragraph">Paragraph</button></span>
+      <span class="insw" draggable="true" data-drag-insert="list"><span class="grip" aria-hidden="true">⠿</span><button type="button" class="ins" data-insert="list">List</button></span>
+      <span class="insw" draggable="true" data-drag-insert="image"><span class="grip" aria-hidden="true">⠿</span><button type="button" class="ins" data-insert="image">Image</button></span>
+      <span class="insw" draggable="true" data-drag-insert="table"><span class="grip" aria-hidden="true">⠿</span><button type="button" class="ins" data-insert="table">Table</button></span>
+      <span class="insw" draggable="true" data-drag-insert="pagebreak"><span class="grip" aria-hidden="true">⠿</span><button type="button" class="ins" data-insert="pagebreak">Page break</button></span>
+    </div>
+    <span class="tblabel" id="agInsLbl">Insert · drag onto the page, or select to add after the current block</span>
+  </div>
+  <div class="tbgroup" role="group" aria-labelledby="agTextLbl">
+    <div class="tbrow">
+      <label for="tbFont" class="sr-only">Font</label>
+      <select id="tbFont" class="tbselect"></select>
+      <label for="tbSize" class="sr-only">Size in points</label>
+      <input id="tbSize" class="tbnum" type="number" min="7" max="72" step="0.5" inputmode="decimal">
+      <button type="button" class="tgl tbtgl" id="tbBold" aria-pressed="false"><b>B</b><span class="sr-only">Bold</span></button>
+      <button type="button" class="tgl tbtgl" id="tbItalic" aria-pressed="false"><i>I</i><span class="sr-only">Italic</span></button>
+    </div>
+    <span class="tblabel" id="agTextLbl">Text</span>
+  </div>
+  <div class="tbgroup" role="group" aria-labelledby="agArrLbl">
+    <div class="tbrow">
+      <button type="button" class="tb" id="combineBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4h12"/><path d="M4 16h12"/><path d="M10 6v8"/><path d="M7 11l3 3 3-3"/></svg>Combine</button>
+      <button type="button" class="tb" id="moveUpBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4"/><path d="M5 9l5-5 5 5"/></svg>Move up</button>
+      <button type="button" class="tb" id="moveDownBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12"/><path d="M5 11l5 5 5-5"/></svg>Move down</button>
+      <button type="button" class="tb" id="deleteBtn"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6h12"/><path d="M8 6V4h4v2"/><path d="M6 6l1 10h6l1-10"/></svg>Delete</button>
+    </div>
+    <span class="tblabel" id="agArrLbl">Arrange</span>
+  </div>
+  <p class="selinfo tbend" id="selInfo" aria-live="polite"></p>
+</div>

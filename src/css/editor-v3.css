@@ -39,7 +39,7 @@
 .pvbox.error{outline:1.5px dashed #B3361B}
 .pvbox.sel{outline:2.5px solid #2148C0;background:rgba(33,72,192,.05)}
 .pvbox:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-.pvtag{position:absolute;left:-2px;top:-19px;font:500 10.5px/1 'IBM Plex Mono',ui-monospace,monospace;padding:3px 5px;border-radius:3px;background:#3F4652;color:#FFFFFF;white-space:nowrap;opacity:0;pointer-events:none}
+.pvtag{position:absolute;left:-2px;top:-19px;font:500 10.5px/1 'JetBrains Mono',ui-monospace,monospace;padding:3px 5px;border-radius:3px;background:#3F4652;color:#FFFFFF;white-space:nowrap;opacity:0;pointer-events:none}
 .pvbox.fixed .pvtag{background:#6A3DB8}
 .pvbox:hover .pvtag,.pvbox.sel .pvtag,.pvbox:focus-visible .pvtag,.pvbox.fixed .pvtag{opacity:1}
 .layer-page{margin:14px 8px 6px;font-size:13px;font-weight:600}

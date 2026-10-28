@@ -2,6 +2,7 @@
 body:not([data-mode="audit"]) .only-audit{display:none!important}
 body:not([data-mode="author"]) .only-author{display:none!important}
 body:not([data-mode="home"]) .only-home{display:none!important}
+body:not([data-mode="retag"]) .only-retag{display:none!important}
 .chipnote{font-size:12px;padding:2px 9px;border-radius:999px;background:#2A2E36;color:#E6E8EB;white-space:nowrap}
 /* insert toolbar */
 .tlabel{font-weight:600;margin-right:4px}

@@ -53,6 +53,7 @@ function authorRules(d) {
     if (b.type === 'table') { scan(b.caption, true, false); b.rows.forEach((r, ri) => r.forEach((c, ci) => scan(c, (b.headerRow && ri === 0) || (b.headerCol && ci === 0), false))); }
     if (bad.size) add('error', 'The chosen font can’t show: ' + [...bad].slice(0, 6).join(' '), '1.3.1', b.id, 'These characters would not be readable in the PDF. Replace them or choose another font.');
   }
+  F.push(...remediationFindings(d));
   return F;
 }
 async function layoutRules(d) {

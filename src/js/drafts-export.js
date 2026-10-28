@@ -2,8 +2,7 @@
 async function saveDraftFile() {
   if (!author.doc) return;
   const data = JSON.stringify(author.doc);
-  if (!downloads) { alert('Downloads aren’t available in this view. Your draft is still kept in this browser.'); return; }
-  try { await downloads.save({ filename: slug(author.doc.title) + '.pwj', data }); announce('Draft saved.'); $('#saveChip').textContent = 'Draft saved to a file'; }
+  try { await saveFile(slug(author.doc.title) + '.pwj', data, 'application/json'); announce('Draft saved.'); $('#saveChip').textContent = 'Draft saved to a file'; }
   catch (e) {
     if (e && e.code === 'rejected_extension') draftExtensionBlocked(data);
     else if (e && e.code !== 'declined') alert('The draft could not be saved here (' + (e.code || 'unavailable') + '). It is still kept in this browser.');
@@ -18,7 +17,7 @@ function draftExtensionBlocked(data) {
     el('p', { class: 'small' }, 'If you need a file now, you can save the same draft with a .json extension and rename it to .pwj afterwards. The editor opens both.'));
   const note = el('span', { class: 'small muted', 'aria-live': 'polite' });
   const alt = el('button', { type: 'button', class: 'btn', onclick: async () => {
-    try { await downloads.save({ filename: slug(author.doc.title) + '.pwj.json', data }); note.textContent = 'Saved.'; }
+    try { await saveFile(slug(author.doc.title) + '.pwj.json', data, 'application/json'); note.textContent = 'Saved.'; }
     catch (err) { note.textContent = err && err.code === 'declined' ? 'Download cancelled.' : 'That didn’t work either (' + ((err && err.code) || 'unavailable') + ').'; }
   } }, 'Save as .json instead');
   foot.replaceChildren(alt, note, el('button', { type: 'button', class: 'btn push', onclick: () => dlg.close() }, 'Close'));
@@ -89,12 +88,12 @@ async function openExport() {
     el('p', { class: 'small muted' }, 'Still worth a human check: read the alternative text aloud and confirm it says what each image means. In the full version, veraPDF also validates every export on the server; it isn’t connected in this test build.'));
     const dlNote = el('span', { class: 'small muted', 'aria-live': 'polite' });
     const dl = el('button', { type: 'button', class: 'btn primary', onclick: async () => {
-      try { await downloads.save({ filename: fname, data: new Blob([author.lastPdf], { type: 'application/pdf' }) }); dlNote.textContent = 'Saved.'; }
+      try { await saveFile(fname, new Blob([author.lastPdf], { type: 'application/pdf' })); dlNote.textContent = 'Saved.'; }
       catch (err) { dlNote.textContent = err && err.code === 'declined' ? 'Download cancelled.' : 'Downloads aren’t available here.'; }
     } }, 'Download PDF');
-    if (downloads) foot.append(dl, dlNote); else foot.append(el('span', { class: 'small muted' }, 'Downloads aren’t available in this view.'));
+    foot.append(dl, dlNote);
     foot.append(viewBtn, close);
-    (downloads ? dl : viewBtn).focus();
+    dl.focus();
   } catch (err) {
     console.error(err);
     body.replaceChildren(el('div', { class: 'blocked', role: 'alert' }, icon('error'), el('span', {}, el('strong', { style: 'display:block' }, 'The PDF could not be built'), el('span', { class: 'small' }, String(err && err.message || err)))));

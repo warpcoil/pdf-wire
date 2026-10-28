@@ -11,14 +11,16 @@ function startNewDocument(s) {
   announce('Created ' + s.title + '. The cursor is in the first paragraph.');
 }
 function enterAuthor(opts) {
+  if (hist.docRef !== author.doc) { author.multi.clear(); resetHistory(); }
   setMode('author'); setStatus(null);
   setView(author.view, true);
-  renderEditor(opts || {}); renderOutline(); renderProps(); runAuthorChecks(); saveLocal();
+  renderEditor(opts || {}); renderOutline(); renderProps(); runAuthorChecks(); saveLocal(); updateToolbar();
 }
 function changed(kind, opts) {
+  recordHistory(kind);
   if (kind === 'all' || kind === 'sheet') renderEditor(opts || {});
   if (kind === 'all') renderProps();
-  renderOutline(); scheduleAuthorChecks(); saveLocalSoon(); updateHeader(); schedulePreview();
+  renderOutline(); scheduleAuthorChecks(); saveLocalSoon(); updateHeader(); schedulePreview(); updateToolbar();
 }
 let saveTimer;
 function saveLocalSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(saveLocal, 600); }
@@ -78,14 +80,20 @@ function selectBlock(id) {
   author.sel = id;
   document.querySelectorAll('.blk.sel, .pvbox.sel').forEach((b) => b.classList.remove('sel'));
   document.querySelectorAll('.blk[data-id="' + id + '"], .pvbox[data-id="' + id + '"]').forEach((w) => w.classList.add('sel'));
-  renderProps(); updateOutlineCurrent();
+  renderProps(); updateOutlineCurrent(); updateToolbar();
 }
 function renderBlock(b) {
   const tag = blockTag(b);
-  const w = el('div', { class: 'blk' + (author.sel === b.id ? ' sel' : ''), 'data-id': b.id });
+  const w = el('div', { class: 'blk' + (author.sel === b.id ? ' sel' : '') + (author.multi.size > 1 && author.multi.has(b.id) ? ' multi' : ''), 'data-id': b.id });
   w.addEventListener('focusin', () => selectBlock(b.id));
-  w.addEventListener('mousedown', (e) => { if (e.target === w) selectBlock(b.id); });
-  w.append(el('span', { class: 'gut', 'aria-hidden': 'true' }, chip(tag)));
+  w.addEventListener('mousedown', (e) => {
+    const inText = e.target.closest('textarea, input');
+    if (e.ctrlKey || e.metaKey || (e.shiftKey && !inText)) { if (e.target.closest('.grip')) return; e.preventDefault(); toggleMulti(b.id, e.shiftKey && !e.ctrlKey && !e.metaKey); return; }
+    if (author.multi.size && !e.target.closest('.grip')) clearMulti();
+    if (e.target === w) selectBlock(b.id);
+  }, true);
+  w.append(el('span', { class: 'gut', 'aria-hidden': 'true' }, el('span', { class: 'selmark' }, '✓'),
+    el('span', { class: 'grip', draggable: 'true', title: 'Drag to move. Drop onto another block to combine them.' }, '⠿'), chip(tag)));
   if (b.type === 'heading' || b.type === 'paragraph') {
     const ta = el('textarea', { class: 'tx', rows: '1',
       'aria-label': b.type === 'heading' ? 'Heading level ' + b.level : 'Paragraph', placeholder: b.type === 'heading' ? 'Heading text' : 'Type a paragraph' });
@@ -134,6 +142,7 @@ function renderBlock(b) {
         const inp = el('input', { type: 'text', 'aria-label': (isH ? 'Header cell, ' : 'Cell, ') + 'row ' + (r + 1) + ', column ' + (c + 1) });
         inp.value = cell;
         inp.addEventListener('input', () => { b.rows[r][c] = inp.value; changed('text'); });
+        inp.addEventListener('focus', () => { const was = author.cell; author.cell = { id: b.id, r, c }; if (author.sel === b.id && (!was || was.id !== b.id || was.r !== r || was.c !== c)) updateCellTools(b); });
         inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (r + 1 < b.rows.length) focusBlock(b.id, (r + 1) * row.length + c); } });
         const cellEl = isH ? el('th', { scope: (b.headerRow && r === 0) ? 'col' : 'row' }, inp) : el('td', {}, inp);
         if (isH && b.headerFill) cellEl.style.background = b.headerFill;

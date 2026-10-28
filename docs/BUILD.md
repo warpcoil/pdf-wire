@@ -16,11 +16,14 @@ src/
 │   │                       status bar, report dialog
 │   ├── modes-home.css      Mode switching, insert toolbar, home screen
 │   ├── editor.css          Write view, panels and forms
-│   └── editor-v3.css       Property controls, Pages view, layer list, forced-colours rules
+│   ├── editor-v3.css       Property controls, Pages view, layer list, forced-colours rules
+│   ├── remediate.css       Remediation review, image descriptions, tag in place
+│   └── workbench.css       Test build 6 design: header, labelled toolbars, selection,
+│                           drag and drop, combine dialog, side-by-side tagging
 ├── html/
-│   ├── appbar.html         Top bar and both toolbars
+│   ├── appbar.html         Header (mode tabs) and the audit, tag-in-place and editor toolbars
 │   ├── workspace.html      Panes, status bar, live region, hidden file input
-│   └── dialogs.html        Document settings, font licences, export, report
+│   └── dialogs.html        Document settings, font licences, export, report, combine
 ├── js/                     App code, in load order:
 │   ├── helpers.js          $, el(), icons, reference data, PDF.js setup, state
 │   ├── audit-loading.js    Opening PDFs and drafts
@@ -35,13 +38,24 @@ src/
 │   ├── author-pages-view.js  Pages view (real page preview)
 │   ├── author-panels.js    Side panels, properties panel, document settings
 │   ├── drafts-export.js    .pwj drafts, export and release gate, font licences dialog
+│   ├── history.js          Undo and redo (snapshots, with images pooled); Ctrl+Z shortcuts
+│   ├── combine-dnd.js      Multi-select, the toolbar, Combine, and drag and drop in the Write view
+│   ├── remediate-extract.js  Remediation: reading text, images, rules and links from a PDF
+│   ├── remediate-layout.js   Remediation: layout analysis (reading order, headings, lists, tables)
+│   ├── remediate-rebuild.js  Remediation: rebuild as a draft, review panel, image descriptions,
+│   │                         table and block tools
+│   ├── remediate-tag.js      Remediation: tag in place (content lexer, probe, writer; uses pdf-lib)
+│   ├── remediate-tag-view.js Remediation: the tag-in-place review screen
+│   ├── remediate-ui.js       Remediation: choosing a method, entry points
 │   └── wiring.js           Event listeners and start-up
 └── generated/
     ├── fontdata.json       Subsetted fonts and metrics (written by `fonts`)
     └── fontmeta.json       Font picker and licence data (written by `fonts`)
 ```
 
-The sample PDF is taken from `examples/riverside-sample-with-problems.pdf`.
+The WordPress theme and pages for the website are in `wordpress/`, outside `src/`. They have their own build script, `wordpress/build-theme.py`, which copies the compiled `index.html` into the theme. See [wordpress/README.md](../wordpress/README.md).
+
+The sample PDFs are taken from `examples/riverside-sample-with-problems.pdf` (**Open sample PDF**) and `examples/remediation/untagged-council-report.pdf` (**Try an untagged sample**).
 
 ### How the template works
 
@@ -50,7 +64,7 @@ The sample PDF is taken from `examples/riverside-sample-with-problems.pdf`.
 | Directive | Replaced by |
 | --- | --- |
 | `<!-- @include css/base.css -->` | The file's contents, verbatim. Paths are relative to `src/`. |
-| `<!-- @generated data -->` | Three constants: `SAMPLE_PDF_B64`, `FONTDATA` and `FONTMETA`. |
+| `<!-- @generated data -->` | Four constants: `SAMPLE_PDF_B64`, `REMEDIATE_SAMPLE_B64`, `FONTDATA` and `FONTMETA`. |
 
 To add a file, create it and add an `@include` line in the right place. `compile` and `check` warn about any `.css`, `.js` or `.html` file in `src/` that isn't included.
 
@@ -70,10 +84,10 @@ So:
 - A top-level `const`, `let` or `function` in one file is visible in every other file. There are no imports or exports.
 - **Order matters** for code that runs at load time. Function declarations are hoisted, but a `const` must be defined in an earlier file (or earlier in the same file) than any code that *runs* immediately and uses it. Code inside functions can use anything.
 - Two files can't declare the same top-level name. The browser reports a `SyntaxError` and the app doesn't start.
-- `FONTDATA`, `FONTMETA` and `SAMPLE_PDF_B64` come from a separate `<script>` before the app, so they're globals.
+- `FONTDATA`, `FONTMETA`, `SAMPLE_PDF_B64` and `REMEDIATE_SAMPLE_B64` come from a separate `<script>` before the app, so they're globals.
 - Editors may flag names from other files as undefined. That's expected.
 
-`window.__app` (set in `wiring.js`) exposes `buildPdf`, `auditBytes` and the app state for the smoke test and for debugging in the browser console.
+`window.__app` (set in `wiring.js`) exposes `buildPdf`, `auditBytes`, the app state and the remediation functions (`remediate`) for the tests and for debugging in the browser console.
 
 ## Build files
 
@@ -83,6 +97,9 @@ build/
 ├── fonts.json        Font families, weights and character set
 ├── requirements.txt  Python dependencies (fontTools, for fonts and check only)
 ├── smoke-test.mjs    Optional export test in headless Chromium (Node)
+├── remediate-test.mjs     Optional test of both remediation methods (Node)
+├── check-tagged.py        Independent structure check for tagged PDFs (pikepdf)
+├── remediation-fixtures.py  Makes the ReportLab test PDFs in examples/remediation/
 ├── package.json      Dependencies for the smoke test (Playwright)
 ├── .gitignore        Ignores .cache/ and node_modules/
 └── .cache/           Downloaded source fonts (not committed)
@@ -192,7 +209,7 @@ Errors (the command fails):
 - `widths` has one entry per glyph and `cmap` matches the font's own cmap
 - `FONTMETA.ofl` matches `OFL.txt`
 - `FONT-LICENSES.md` has a row for every family
-- `SAMPLE_PDF_B64` matches `examples/riverside-sample-with-problems.pdf`
+- `SAMPLE_PDF_B64` matches `examples/riverside-sample-with-problems.pdf`, and `REMEDIATE_SAMPLE_B64` matches `examples/remediation/untagged-council-report.pdf`
 
 Warnings:
 
@@ -215,19 +232,39 @@ npm test
 
 PDF.js loads from cdnjs, as it does for users. To run offline, set `PDFJS_DIR` to a folder containing `pdf.min.js` and `pdf.worker.min.js` from PDF.js 3.11.174. The test blocks the analytics counter, so runs aren't counted as visits.
 
+## Remediation tests
+
+`build/remediate-test.mjs` runs both remediation methods, rebuild and tag in place, on every PDF in `examples/` and `examples/remediation/` (or the files you name), in headless Chromium with the app's own code. A placeholder description is given to every image, and English to any file without a language, standing in for the review. Each result goes through the app's audit; any error fails the test. The tagged files are written to `build/.cache/remediated/`.
+
+`build/check-tagged.py` then checks those files without using any PDF Wire code: every drawing operation is tagged or an artifact, the parent tree matches the structure tree, figures have alternative text, header cells have a scope, links are tagged with an `OBJR`, and no form XObject keeps old MCIDs. With `--original` and `--render`, it also renders both files with `pdftoppm` and confirms every page is pixel-for-pixel identical.
+
+```
+cd build
+node remediate-test.mjs                        # or: node remediate-test.mjs some.pdf other.pdf
+pip install pikepdf pillow                     # and poppler-utils for --render
+python check-tagged.py .cache/remediated/*-tagged.pdf
+python check-tagged.py .cache/remediated/two-column-newsletter-tagged.pdf --original ../examples/remediation/two-column-newsletter.pdf --render
+```
+
+Tag in place also needs pdf-lib, which loads from cdnjs like PDF.js. For an offline run, put `pdf-lib.min.js` from pdf-lib 1.17.1 in the `PDFJS_DIR` folder too.
+
+To change the ReportLab test files, edit and run `python build/remediation-fixtures.py` (needs `reportlab` and `pillow`). How the other test files were made is described in `examples/remediation/README.md`. [REMEDIATION.md](REMEDIATION.md#8-testing) lists the current results.
+
 ## Before a release
 
 1. `python build/build.py all` if `fonts.json` changed. Otherwise `python build/build.py compile`, then `check`.
-2. `npm test` in `build/`.
+2. `npm test` and `node remediate-test.mjs` in `build/`, then `python check-tagged.py .cache/remediated/*-tagged.pdf`.
 3. Export a document with the editor and validate it with [veraPDF](https://verapdf.org) (PDF/UA-1 profile) or [PAC](https://pac.pdf-accessibility.org/).
-4. Update the test build number in the `<title>` in `src/index.html` and in `README.md`.
-5. Commit `src/`, `index.html` and any other changes together. `build/.cache/` is not committed.
+4. Update the test build number in the `<title>` in `src/index.html`, the brand in `src/html/appbar.html`, the producer in `src/js/pdf-writer.js`, the report footer in `src/js/audit-report.js`, and `README.md`.
+5. If the website should offer the new build, run `python wordpress/build-theme.py` and upload `wordpress/dist/pdf-wire-theme.zip`.
+6. Commit `src/`, `index.html` and any other changes together. `build/.cache/`, `wordpress/dist/` and `wordpress/theme/pdf-wire/editor/` are not committed.
 
 ## Runtime dependencies
 
-Two resources are not built into `index.html` and load from public CDNs:
+Three resources are not built into `index.html` and load from public CDNs:
 
 - **PDF.js 3.11.174** from `cdnjs.cloudflare.com`
-- **IBM Plex** (interface only) from Google Fonts
+- **pdf-lib 1.17.1** from `cdnjs.cloudflare.com`, only when a PDF is tagged in place (see `PDFLIB_URL` in `src/js/remediate-tag.js`)
+- **Inter** and **JetBrains Mono** (interface only) from Google Fonts
 
-The build scripts don't change these. To make an offline copy, download both and point the `<script>` and `<link>` tags in `src/index.html` at local copies, then compile, as described in the [README](../README.md#getting-started).
+The build scripts don't change these. To make an offline copy, download them and point the `<script>` and `<link>` tags in `src/index.html`, and `PDFLIB_URL`, at local copies, then compile, as described in the [README](../README.md#getting-started).

@@ -62,7 +62,7 @@ function renderInspector() {
   } else {
     host.append(el('p', { class: 'small', style: 'margin:12px 0 0;display:flex;gap:6px;align-items:center' }, icon('ok'), 'No issues found on this tag.'));
   }
-  host.append(el('p', { class: 'note' }, 'Existing PDFs are read-only in this build. Fixing them in place comes later; new documents can be created with New.'));
+  host.append(el('p', { class: 'note' }, 'This view only checks the PDF. To fix it, use Remediate this PDF: rebuild it as a new document, or tag the original pages in place.'));
 }
 
 /* ---------- rendering: checker ---------- */

@@ -6,7 +6,7 @@
 .blk:hover{outline-color:#D5D9DE}
 .blk.sel{outline:2.5px solid #2148C0;background:#F5F7FE}
 .blk .gut{position:absolute;left:-72px;top:9px;width:60px;display:flex;justify-content:flex-end}
-.tx{display:block;width:100%;border:0;background:transparent;resize:none;overflow:hidden;padding:2px 0;margin:0;color:#1B1B1B;font-family:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;line-height:1.5}
+.tx{display:block;width:100%;border:0;background:transparent;resize:none;overflow:hidden;padding:2px 0;margin:0;color:#1B1B1B;font-family:'Inter','Segoe UI',system-ui,sans-serif;line-height:1.5}
 .tx:focus{outline:none}
 .tx::placeholder{color:#636B78}
 .tx.h1{font-size:30px;font-weight:600;line-height:1.25}

@@ -1,8 +1,7 @@
 /* ---------- Pages view: real page preview ---------- */
 function setView(v, quiet) {
   author.view = v;
-  $('#viewWrite').setAttribute('aria-pressed', v === 'write' ? 'true' : 'false');
-  $('#viewPages').setAttribute('aria-pressed', v === 'pages' ? 'true' : 'false');
+  updateModeTabs();
   $('#writeView').hidden = v !== 'write';
   $('#pagesView').hidden = v !== 'pages';
   if (v === 'pages') { schedulePreview(0); if (!quiet) announce('Pages view: a preview of the exported pages.'); }

@@ -54,8 +54,51 @@
   </div>
   <div class="dlg-body report" id="reportBody"></div>
   <div class="dlg-foot">
-    <button type="button" class="btn primary" id="downloadReport" hidden>Download report (HTML)</button>
+    <button type="button" class="btn primary" id="downloadReport">Download report (HTML)</button>
     <span class="small muted" id="downloadNote"></span>
     <button type="button" class="btn push" id="closeReport2">Close</button>
   </div>
+</dialog>
+
+<dialog id="remDialog" aria-labelledby="remTitle">
+  <div class="dlg-head">
+    <h2 id="remTitle">Remediate a PDF</h2>
+    <button type="button" class="iconbtn" id="remClose" aria-label="Close"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
+  </div>
+  <div class="dlg-body" id="remBody"></div>
+  <div class="dlg-foot" id="remFoot"></div>
+</dialog>
+
+<dialog id="altDialog" aria-labelledby="altTitle">
+  <div class="dlg-head">
+    <h2 id="altTitle">Describe images</h2>
+    <button type="button" class="iconbtn" id="altClose" aria-label="Close"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
+  </div>
+  <div class="dlg-body" id="altBody"></div>
+  <div class="dlg-foot" id="altFoot"></div>
+</dialog>
+
+<dialog id="origDialog" aria-labelledby="origTitle" class="wide">
+  <div class="dlg-head">
+    <h2 id="origTitle">Original PDF</h2>
+    <button type="button" class="iconbtn" id="origClose" aria-label="Close"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
+  </div>
+  <div class="dlg-body">
+    <div class="tgroup" style="margin-bottom:8px">
+      <button type="button" class="iconbtn" id="origPrev" aria-label="Previous page"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M12 6l-4 4 4 4"/></svg></button>
+      <span class="num" id="origLabel" aria-live="polite"></span>
+      <button type="button" class="iconbtn" id="origNext" aria-label="Next page"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 6l4 4-4 4"/></svg></button>
+      <span class="small muted" id="origNote" style="margin-left:12px"></span>
+    </div>
+    <div class="origstage"><div class="sheet" id="origSheet" role="img" aria-label="The original page, for comparison"></div></div>
+  </div>
+</dialog>
+
+<dialog id="combineDialog" aria-labelledby="combineTitle">
+  <div class="dlg-head">
+    <h2 id="combineTitle">Combine blocks</h2>
+    <button type="button" class="iconbtn" id="combineClose" aria-label="Close"><svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg></button>
+  </div>
+  <div class="dlg-body" id="combineBody"></div>
+  <div class="dlg-foot" id="combineFoot"></div>
 </dialog>

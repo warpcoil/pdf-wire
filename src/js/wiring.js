@@ -1,4 +1,15 @@
 /* ---------- wiring ---------- */
+/* Check: the current draft as it would be exported, else the open PDF, else choose one */
+async function checkMode() {
+  if (state.mode === 'author' && author.doc) {
+    try {
+      announce('Building the PDF to check it…');
+      const out = await buildPdf(author.doc);
+      openBytes(out.bytes, slug(author.doc.title) + '.pdf');
+    } catch (e) { console.error(e); alert('The draft could not be built: ' + (e.message || e)); }
+  } else if (state.pdf) setMode('audit');
+  else $('#checkInput').click();
+}
 async function openAny(file) {
   if (!file) return;
   if (/\.(pwj|json)$/i.test(file.name) || file.type === 'application/json') { openDraftFile(file); return; }
@@ -25,8 +36,17 @@ $('#backToEdit').addEventListener('click', () => enterAuthor({ focusId: author.s
 $('#saveDraftBtn').addEventListener('click', saveDraftFile);
 $('#exportBtn').addEventListener('click', openExport);
 document.querySelectorAll('[data-insert]').forEach((b) => b.addEventListener('click', () => doInsert(b.dataset.insert)));
-$('#viewWrite').addEventListener('click', () => setView('write'));
-$('#viewPages').addEventListener('click', () => setView('pages'));
+$('#homeBtn').addEventListener('click', () => setMode('home'));
+$('#modeWrite').addEventListener('click', () => { if (author.doc) { if (state.mode !== 'author') enterAuthor({ focusId: author.sel }); setView('write'); } else openDocDialog('new'); });
+$('#modePages').addEventListener('click', () => { if (!author.doc) return; if (state.mode !== 'author') enterAuthor({}); setView('pages'); });
+$('#modeCheck').addEventListener('click', checkMode);
+$('#modeRemediate').addEventListener('click', () => {
+  if (rt.T) { setMode('retag'); renderRetag(); }
+  else if (state.mode === 'audit' && state.bytes) startRemediation(state.bytes, state.fileName);
+  else $('#remInput').click();
+});
+$('#checkInput').addEventListener('change', (e) => { openAny(e.target.files[0]); e.target.value = ''; });
+$('#remInput').addEventListener('change', (e) => { remediateFile(e.target.files[0]); e.target.value = ''; });
 $('#imgInput').addEventListener('change', (e) => onImageChosen(e.target.files[0]));
 $('#docForm').addEventListener('submit', submitDocDialog);
 $('#docCancel').addEventListener('click', () => $('#docDialog').close());
@@ -52,8 +72,9 @@ let rz;
 window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => {
   if (state.mode === 'audit' && state.pdf) renderPage();
   if (state.mode === 'author') { document.querySelectorAll('#edSheet textarea.tx').forEach(autosize); schedulePreview(); }
+  if (state.mode === 'retag' && rt.T) rtRenderPage();
 }, 150); });
 
 if (!pdfjsLib) showError('The PDF engine did not load. Check your connection and reload the page.');
 else setMode('home');
-window.__app = { state, author, openSample, buildPdf, auditBytes };
+window.__app = { state, author, openSample, buildPdf, auditBytes, remediate: REMEDIATE_API };
